@@ -1,10 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-
-<h1>メッセージ一覧</h1>
-
-    @if (count($tasks) > 0)
+        <h1>タスク一覧</h1>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -23,10 +20,6 @@
                 @endforeach
             </tbody>
         </table>
-    @endif
-    
-    {{ $tasks->links() }}
-    
-    {!! link_to_route("tasks.create", "新規タスクの投稿", [], ["class" => "btn btn-primary"]) !!}
-
+        {{ $tasks ?? ''->links() }}
+        {!! link_to_route("tasks.create", "新規タスクの投稿", [], ["class" => "btn btn-primary"]) !!}
 @endsection

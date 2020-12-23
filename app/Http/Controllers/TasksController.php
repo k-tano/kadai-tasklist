@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+
 use App\Task;
 
 class TasksController extends Controller
 {
+    
+        //middlewareによる認証制限を追加
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
+    
     /**
      * Display a listing of the resource.
      *
@@ -15,10 +24,21 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks = Task::paginate(25);
-        return view ("tasks.index",[
-            "tasks" => $tasks
-        ]);
+        $data = [];
+        if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            // ユーザの投稿の一覧を作成日時の降順で取得
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            return view("tasks.index",$data);
+        }
+        // Welcomeビューでそれらを表示
+        return view('welcome');
     }
 
     /**
@@ -51,6 +71,7 @@ class TasksController extends Controller
         $task = new Task;
         $task->status = $request->status;
         $task->content = $request->content;
+        $task->user_id = $request->user()->id;
         $task->save();
         
         return redirect("/");
